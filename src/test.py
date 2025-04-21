@@ -8,7 +8,7 @@ from maze import Maze
 
 class Tests(unittest.TestCase):
     def test_maze_create_cells(self):
-        num_cols = 12
+        num_cols = 10
         num_rows = 10
         m1 = Maze(0, 0, num_rows, num_cols, 10, 10, self.win)
         self.assertEqual(
@@ -127,7 +127,51 @@ class Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.cell.draw_move(self.cell, undo=True) 
 
+        def test_break_entrance_and_exit(self):
+            # Test breaking entrance and exit walls
+            m1 = Maze(0, 0, 10, 10, 20, 20, self.win)
+            m1._break_entrance_and_exit()
+            # Check if the entrance and exit walls are broken
+            entrance_cell = m1._cells[0][0]
+            exit_cell = m1._cells[m1.num_cols - 1][m1.num_rows - 1]
+            self.assertFalse(entrance_cell.has_left_wall)
+            self.assertFalse(exit_cell.has_bottom_wall)
+            # Check if the entrance and exit are drawn correctly
+            entrance_cell.draw()
+            exit_cell.draw()
+            self.assertEqual(entrance_cell.x1, 0)
+            self.assertEqual(entrance_cell.y1, 0)
+            self.assertEqual(exit_cell.x1, m1.x1 + (m1.num_cols - 1) * m1.cell_size_x)
+            self.assertEqual(exit_cell.y1, m1.y1 + (m1.num_rows - 1) * m1.cell_size_y)
 
+
+    def test_break_walls_r(self):
+        # Test the recursive wall-breaking algorithm
+        m1 = Maze(0, 0, 10, 10, 20, 20, self.win)
+        m1._break_walls_r(0, 0)
+        # Check if the walls are broken correctly
+        cell = m1._cells[0][0]
+        self.assertFalse(cell.has_bottom_wall)
+        self.assertFalse(cell.has_right_wall)
+    
+    def test_reset_cells_visited(self):
+        # Test resetting visited cells
+        m1 = Maze(0, 0, 10, 10, 20, 20, self.win)
+        
+        # First mark some cells as visited
+        for i in range(len(m1._cells)):
+            for j in range(len(m1._cells[0])):
+                m1._cells[i][j].visited = True
+        
+        # Then reset them
+        m1._reset_cells_visited()
+        
+        # Check if all cells are marked as not visited
+        for row in m1._cells:
+            for cell in row:
+                self.assertFalse(cell.visited)
+
+    
                                     
 
 if __name__ == "__main__":

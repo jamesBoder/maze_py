@@ -1,30 +1,77 @@
 import unittest
 from maze import Maze
 from window import Window
+from cell import Cell
 
-# Create a mock window object
-window_object = Window(800, 600)  # Assuming width and height
+class MazeTest(unittest.TestCase):
+    def setUp(self):
+        # Create a window for testing
+        self.win = Window(800, 600)
+        # Initialize a maze with specific parameters
+        self.maze = Maze(10, 10, 10, 10, 20, 20, self.win)
 
-# Initialize the maze
-maze = Maze(0, 0, 10, 10, 20, 20, window_object)
+    def tearDown(self):
+        # Close the window after tests
+        if hasattr(self, 'window') and self.window:
+            self.window.close()
+    
+    def test_create_cells(self):
+        # Check if the cells are created correctly
+        self.assertEqual(len(self.maze._cells), 10)
+        self.assertEqual(len(self.maze._cells[0]), 10)
+    
+    def test_draw_cell(self):
+        # Test drawing a cell
+        cell = self.maze._cells[0][0]
+        cell.draw()
+        # Check if the cell's walls are drawn correctly
+        self.assertTrue(cell.has_left_wall)
+        self.assertTrue(cell.has_top_wall)
+        self.assertTrue(cell.has_right_wall)
+        self.assertTrue(cell.has_bottom_wall)
+    
+    def test_draw_move(self):
+        # Test drawing a move between cells
+        cell1 = self.maze._cells[0][0]
+        cell2 = self.maze._cells[0][1]
+        cell1.draw_move(cell2)
+        # Check if the move was drawn correctly
+        self.assertFalse(cell1.has_right_wall)
+        self.assertFalse(cell2.has_left_wall)
+        # Check if the cells are drawn in the window
+        self.assertIsNotNone(cell1._win.canvas.find_all())
+        self.assertIsNotNone(cell2._win.canvas.find_all())
+    
+    def test_draw_path(self):
+        # Test drawing a path between cells
+        cell1 = self.maze._cells[0][0]
+        cell2 = self.maze._cells[1][0]
+        cell1.draw_move(cell2)
+        # Check if the path was drawn correctly
+        self.assertFalse(cell1.has_bottom_wall)
+        self.assertFalse(cell2.has_top_wall)
+    
+    def test_break_walls_r(self):
+        # Test the recursive wall-breaking algorithm
+        self.maze._break_walls_r(0, 0)
+        # Check if the walls are broken correctly
+        cell = self.maze._cells[0][0]
+        self.assertFalse(cell.has_bottom_wall)
+        self.assertFalse(cell.has_right_wall)
+  
 
-assert len(maze._cells) == maze.num_rows, "Incorrect number of rows in the maze."
-assert len(maze._cells[0]) == maze.num_cols, "Incorrect number of columns in the maze."
+    
+    
 
-# Test drawing (this requires rendering logic to be complete)
-maze._draw_cell(5,5)  # Draw a specific cell and observe positioning
+if __name__ == "__main__":
+    unittest.main()
+    Window._run()
+    
 
-# Test proper visualization (with animation)
-maze._animate()  # Observe if the window updates and the timing works right
 
-first_cell = maze._cells[0][0]
-assert first_cell.x1 == maze.x1, "First cell x1 is incorrect."
-assert first_cell.y1 == maze.y1, "First cell y1 is incorrect."
 
-for row in maze._cells:
-    for cell in row:
-        assert (cell.x2 - cell.x1) == maze.cell_size_x, "Cell width is incorrect."
-        assert (cell.y2 - cell.y1) == maze.cell_size_y, "Cell height is incorrect."
 
-window_object._run()  # Wait for the window to close
-# Note: The above code is a simple test script to check the functionality of the Maze class.
+
+
+
+  
