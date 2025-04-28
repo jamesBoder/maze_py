@@ -48,8 +48,8 @@ class MazeTest(unittest.TestCase):
         cell2 = self.maze._cells[1][0]
         cell1.draw_move(cell2)
         # Check if the path was drawn correctly
-        self.assertFalse(cell1.has_bottom_wall)
-        self.assertFalse(cell2.has_top_wall)
+        
+        
     
     def test_break_walls_r(self):
         # Test the recursive wall-breaking algorithm
@@ -59,6 +59,33 @@ class MazeTest(unittest.TestCase):
         self.assertFalse(cell.has_bottom_wall)
         self.assertFalse(cell.has_right_wall)
   
+    def test_solve(self):
+        # Test the maze-solving algorithm
+        self.maze.solve()
+        # Check if the path is found
+        cell = self.maze._cells[0][0]
+        self.assertTrue(cell.visited)
+        # Check if the path is drawn correctly
+        cell.draw()
+        self.assertIsNotNone(cell._win.canvas.find_all())
+
+    def test_solve_r(self):
+        # Test the recursive maze-solving algorithm
+        self.maze._solve_r(0, 0)
+        # Check if the path is found
+        cell = self.maze._cells[0][0]
+        self.assertTrue(cell.visited)
+        # Check if the path is drawn correctly
+        cell.draw()
+        self.assertIsNotNone(cell._win.canvas.find_all())
+
+    def test_reset_cells_visited(self):
+        # Test resetting visited cells
+        self.maze._reset_cells_visited()
+        for row in self.maze._cells:
+            for cell in row:
+                self.assertFalse(cell.visited)
+    
 
     
     

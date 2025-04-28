@@ -48,28 +48,30 @@ class Cell:
         else:
             self._win.draw_line(Line(Point(self.x1, self.y2), Point(self.x2, self.y2)), fill_color="#d9d9d9")
         
-    def draw_move(self, to_cell, undo=False):
+    def draw_move(self, to_cell, undo=False, modify_walls=True):
         # Only proceed if we have a window and it's not destroyed
         if self._win is None:
             return
         
-        # Check if cells share an edge and determine direction
-        if to_cell.x1 == self.x2:  # Moving right
-            self.has_right_wall = undo
-            to_cell.has_left_wall = undo
-        elif to_cell.x2 == self.x1:  # Moving left
-            self.has_left_wall = undo
-            to_cell.has_right_wall = undo
-        elif to_cell.y1 == self.y2:  # Moving down
-            self.has_bottom_wall = undo
-            to_cell.has_top_wall = undo
-        elif to_cell.y2 == self.y1:  # Moving up
-            self.has_top_wall = undo
-            to_cell.has_bottom_wall = undo
-        
-        # Redraw both cells to show the wall changes
-        self.draw()
-        to_cell.draw()
+        # Modify walls only if specified (for maze creation)
+        if modify_walls:
+            # Check if cells share an edge and determine direction
+            if to_cell.x1 == self.x2:  # Moving right
+                self.has_right_wall = undo
+                to_cell.has_left_wall = undo
+            elif to_cell.x2 == self.x1:  # Moving left
+                self.has_left_wall = undo
+                to_cell.has_right_wall = undo
+            elif to_cell.y1 == self.y2:  # Moving down
+                self.has_bottom_wall = undo
+                to_cell.has_top_wall = undo
+            elif to_cell.y2 == self.y1:  # Moving up
+                self.has_top_wall = undo
+                to_cell.has_bottom_wall = undo
+            
+            # Redraw both cells to show the wall changes
+            self.draw()
+            to_cell.draw()
         
         try:
             # Calculate center of current cell
@@ -92,24 +94,3 @@ class Cell:
         except:
             # Silently fail if drawing fails (e.g., window closed)
             pass
-
-    def _reset_cells_visited(self):
-        # reset the visited property of all cells
-        for row in self._cells:
-            for cell in row:
-                cell.visited = False
-                cell.has_left_wall = True
-                cell.has_top_wall = True        
-                cell.has_right_wall = True
-                cell.has_bottom_wall = True
-                
-    
-                    
-
-
-            
-
-            
-       
-        
-            

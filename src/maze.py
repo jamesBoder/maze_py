@@ -183,12 +183,75 @@ class Maze:
         for row in self._cells:
             for cell in row:
                 cell.visited = False
-                cell.has_left_wall = True
-                cell.has_top_wall = True        
-                cell.has_right_wall = True
-                cell.has_bottom_wall = True
+
+    def solve(self):
+        
+        # Reset any visited flags from previous runs
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                self._cells[i][j].visited = False
+        
+        # Start solving from the top-left (0,0)
+        return self._solve_r(0, 0)
+        
+    
+    def _solve_r(self, i, j):
+
+        print(f"Visiting cell ({i}, {j})")
+        # Call the _animate function to visualize the current cell
+        self._animate()
+
+        # Mark current cell as visited
+        self._cells[i][j].visited = True
+        
+        # Check if we reached the exit
+        if i == self.num_rows - 1 and j == self.num_cols - 1:
+            return True
+        
+        # for each direction
+        directions = [
+            (-1, 0),  # Check top neighbor
+            (1, 0),   # Check bottom neighbor
+            (0, -1),  # Check left neighbor 
+            (0, 1)    # Check right neighbor
+        ]
+        
+        for di, dj in directions:
+            ni, nj = i + di, j + dj
             
-            
+            # Check if neighbor is valid and not visited
+            if (0 <= ni < self.num_rows and 0 <= nj < self.num_cols and
+                    not self._cells[ni][nj].visited):
+                    
+                # Check if there's no wall between current cell and neighbor
+                can_move = False
+                if di == -1 and not self._cells[i][j].has_top_wall:
+                    can_move = True
+                elif di == 1 and not self._cells[i][j].has_bottom_wall:
+                    can_move = True
+                elif dj == -1 and not self._cells[i][j].has_left_wall:
+                    can_move = True
+                elif dj == 1 and not self._cells[i][j].has_right_wall:
+                    can_move = True
+                
+                if can_move:
+                    # Draw move to neighbor
+                    self._cells[i][j].draw_move(self._cells[ni][nj], modify_walls=False)
+                    
+                    # Recursively try to solve from neighbor
+                    if self._solve_r(ni, nj):
+                        return True
+                    
+                    # If we get here, that direction didn't work
+                    # Undo the move
+                    self._cells[i][j].draw_move(self._cells[ni][nj], undo=True, modify_walls=False) 
+    
+        return False  # No direction worked
+                    
+        
+                    
+                
+                
         
         
      
